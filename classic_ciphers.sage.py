@@ -35,6 +35,7 @@ def tokenize():
             file_string = file.read().replace('\n','').replace(" ", "").upper()
             file_string = regex.sub(r'[\W_]+', '', file_string)
     print file_string
+    
     return file_string
 
 """
