@@ -10,8 +10,28 @@ Sources: n/a
 @version v1.0 February 23, 2018
 
 Instructions:
-    invoke `>>> sage classic_ciphers.sage`
+    invoke `>>> cd Classic-Ciphers
+            >>> sage
+            >>> load("classic_ciphers.sage")
+            >>> plain_txt = tokenize("raw_file.txt", "plain_txt.txt")
+    Affine Cipher
+            >>> key = key_gen_aff()
+            >>> cipher_txt = enc_aff(key, plain_txt, "cipher_text.txt")
+            >>> dec_aff(key, cipher_txt, "plain_txt.txt")
+    Viginere Cipher
+            >>> key = key_gen_vig(5)
+            note: key_gen_vig(key_length) takes in parameter key_length
+                  which is to be determined by the user
+            >>> cipher_txt = enc_vig(key, plain_txt, "cipher_text.txt")
+            >>> dec_vig(key, cipher_txt, "plain_txt.txt")
+    Alphabetic Transposition Cipher
+            >>> rand_alpha, key = key_gen_trans()
+            >>> shift_alpha = shift_alpha(rand_alpha, key)
+            >>> cipher_txt = enc_trans(rand_alpha, shift_alpha, plain_txt, "cipher_text.txt")
+            >>> dec_trans(rand_alpha, shift_alpha, cipher_txt, "plain_txt.txt")
+            `
 """
+
 import os.path
 import re as regex
 import random
@@ -47,16 +67,21 @@ def tokenize(raw_file, plain_txt):
         with open(plain_txt, 'w') as plain_text:
             plain_text.write("tokenized plain text: " + clean_rt_string + "\n")
             plain_txt = clean_rt_string
-    print "plain text: "
+    print "plain text: " + plain_txt
     return plain_txt
 
 
 """
 Affine Cipher
 """
-#returns a two-tuple containing alpha and beta,
-#legal and randomly generated affine keys
 def key_gen_aff():
+    """
+    Description: key_gen_aff() generates a randomly generates a pair of random alpha beta values. Alpha can be any number 2:26 that is relatively prime to 26.
+        Beta is any value 0:26.
+    Arguments: n/a
+    Returns:
+       rand_tuple(two-tuple): (alpha, beta) a random pair of valid alpha beta values.
+    """
     a_set = {x for x in xrange(2,26) if gcd(x,26) == 1}
     b_set = {y for y in xrange(0,26)}
     rand_tuple = (random.sample(a_set,1)[0],random.sample(b_set,1)[0])
@@ -64,9 +89,16 @@ def key_gen_aff():
 
     return rand_tuple
 
-#reads and encrypts plain_txt using the affine cipher and key.
-#writes the output to the file cipher_txt
 def enc_aff(key, plain_txt, cipher_txt):
+    """
+    Description: enc_aff(key,plain_txt,cipher_txt) takes the plain_txt and multiplies it's character value by alpha, adds beta, and the modulo 26. Store the result in cipher_txt.
+    Arguments:
+        key(String): A random alphabetic String.
+        plain_txt(String):plain_txt is a String of the un-encrypted message
+        cipher_txt(String): cipher_txt is an empty String for the encrypted message
+    Returns:
+        cipher_txt(String): cipher_txt is a String with the encrypted message
+    """
     alpha = key[0]
     beta = key[1]
     plain_txt_list = list(plain_txt)
@@ -75,7 +107,7 @@ def enc_aff(key, plain_txt, cipher_txt):
         val = (dictionary[plain_txt_list[i]] * alpha + beta) % 26
         cipher_txt_list.append(alphabet[val])
     cipher_txt = ''.join(cipher_txt_list)
-    print "encrypted text: "
+    print "encrypted text: " + cipher_txt
 
     if not os.path.isfile("cipher_text.txt"):
         print "Error: no such file exists"
@@ -85,8 +117,16 @@ def enc_aff(key, plain_txt, cipher_txt):
 
     return cipher_txt
 
-#reads and decrypts cipher_txt using the affine cipher and key. writes the output to the file plain_txt
 def dec_aff(key, cipher_txt, plain_txt):
+    """
+    Description: dec_aff(key,cipher_txt,plain_txt) takes the message in cipher_txt, subtracts beta from the character values, and then mutiplies by the multiplicative inverse of alpha mod 26
+    Arguments:
+        key(String): A random alphabetic String.
+        plain_txt(String):plain_txt is a String of the un-encrypted message
+        cipher_txt(String): cipher_txt is a String for the encrypted message
+    Returns:
+        plain_txt(String): plain_txt is a String with the decrypted message
+    """
     alpha = key[0]
     beta = key[1]
     alpha_inverse = inverse_mod(alpha,26)
@@ -96,7 +136,7 @@ def dec_aff(key, cipher_txt, plain_txt):
         val = ((dictionary[cipher_txt_list[i]] - beta) * alpha_inverse) % 26
         plain_txt_list.append(alphabet[val])
     plain_txt = ''.join(plain_txt_list)
-    print "decrypted text: " + plain_txt
+    print "decrypted text: "
 
     if not os.path.isfile("plain_txt.txt"):
         print "Error: no such file exists"
@@ -105,11 +145,18 @@ def dec_aff(key, cipher_txt, plain_txt):
             cipher_text.write("--- affine cipher ---\ndecrypted text: " + str(plain_txt) + "\n")
 
     return plain_txt
+
 """
 Vigenere Cipher
 """
-#returns a randomly generated vigenere key of length, "key_length"
 def key_gen_vig(key_length):
+    """
+    Description: key_gen_vig() generates a randomly generated upper-case String of length key_length.
+    Arguments:
+        key_length(Int): The desired length of they key.
+    Returns:
+        key(String): A random alphabetic String of length key_length.
+    """
     key = []
     for x in xrange(0, key_length):
         key.append(Permutations(alphabet).random_element()[0])
@@ -117,29 +164,46 @@ def key_gen_vig(key_length):
     print "vigenere cipher key: " + key
 
     return key
-# reads and encrypts plain_txt using the vigenere cipher and key.
-# writes the output to the file cipher_txt
+
+
 def enc_vig(key, plain_txt, cipher_txt):
+    """
+    Description: enc_vig(key,plain_txt,cipher_txt) takes the plain_txt and adds its character value to the codewords character values, and then storing the results in the cipher_txt file.
+    Arguments:
+        key(String): A random alphabetic String.
+        plain_txt(String):plain_txt is a String of the un-encrypted message
+        cipher_txt(String): cipher_txt is an empty String for the encrypted message
+    Returns:
+        cipher_txt(String): cipher_txt is a String with the encrypted message
+    """
     key_list = list(key)
     plain_txt_list = list(plain_txt)
     cipher_txt_list = []
     for i in xrange(0, len(plain_txt_list)):
             val = (dictionary[plain_txt_list[i]] + dictionary[key_list[i % len(key_list)]]) % 26
             cipher_txt_list.append(alphabet[val])
-
     cipher_txt = ''.join(cipher_txt_list)
+    print "encrypted text: " + cipher_txt
 
     if not os.path.isfile("cipher_text.txt"):
         print "Error: no such file exists"
     else:
-        with open("cipher_text.txt", 'w') as cipher_text:
+        with open("cipher_text.txt", 'a') as cipher_text:
             cipher_text.write("--- viginere cipher ---\nencrypted text: " + str(cipher_txt) + "\n")
 
     return cipher_txt
 
-#reads and decrypts cipher_txt using the vigenere cipher and key.
-# writes the output to the file plain_txt
+
 def dec_vig(key, cipher_txt, plain_txt):
+    """
+    Description: dec_vig(key,cipher_txt,plain_txt) takes the plain_txt and subtracts the codewords character values from the cipher_txt's character values, and then stores the results in the plain_txt file.
+    Arguments:
+        key(String): A random alphabetic String.
+        plain_txt(String):plain_txt is a String of the un-encrypted message
+        cipher_txt(String): cipher_txt is a String for the encrypted message
+    Returns:
+        plain_txt(String): plain_txt is a String with the decrypted message
+    """
     key_list = list(key)
     plain_txt_list = []
     cipher_txt_list = list(cipher_txt)
@@ -147,7 +211,7 @@ def dec_vig(key, cipher_txt, plain_txt):
         val = (dictionary[cipher_txt_list[i]] - dictionary[key_list[i % len(key_list)]]) % 26
         plain_txt_list.append(alphabet[val])
     plain_txt = ''.join(plain_txt_list)
-    print "decrypted text: " + plain_txt
+    print "decrypted text: "
 
     if not os.path.isfile("plain_txt.txt"):
         print "Error: no such file exists"
@@ -175,8 +239,7 @@ def key_gen_trans():
     rand_alpha_num += [str(i) for i in range(0,10)]
     rand_alpha_num = Permutations(rand_alpha_num).random_element()
 
-    print "random alphabet:"
-    print rand_alpha_num
+    print "random alphabet:" + str(rand_alpha_num)
 
     key = random.randint(0,25)
     print "transposition cipher key: " + str(key)
@@ -214,11 +277,13 @@ def enc_trans(rand_alpha_num, shift_alphabet, plain_txt, cipher_txt):
     Returns:
         cipher_txt(String): cipher_txt is a String of the encrypted message
     """
+    cipher_txt = ""
     plain_txt_list = list(plain_txt)
     for chars in plain_txt_list:
         index = rand_alpha_num.index(chars)
         cipher_txt += shift_alphabet[index]
-    print "encrypted text: " + str(cipher_txt)
+    cipher_txt = ''.join(cipher_txt)
+    print "encrypted text: " + cipher_txt
 
     if not os.path.isfile("cipher_text.txt"):
         print "Error: no such file exists"
@@ -228,7 +293,7 @@ def enc_trans(rand_alpha_num, shift_alphabet, plain_txt, cipher_txt):
 
     return cipher_txt
 
-def dec_trans(rand_alpha_num, shift_alphabet, cipher_txt):
+def dec_trans(rand_alpha_num, shift_alphabet, cipher_txt, plain_txt):
     """
     Description: dec_trans() reads and decrypts cipher_txt using the transpositon
         cipher
@@ -246,7 +311,8 @@ def dec_trans(rand_alpha_num, shift_alphabet, cipher_txt):
     for chars in cipher_txt_list:
         index = shift_alphabet.index(chars)
         plain_txt += rand_alpha_num[index]
-    print "decrypted text: " + str(plain_txt)
+    plain_txt = ''.join(plain_txt)
+    print "decrypted text: "
 
     if not os.path.isfile("plain_txt.txt"):
         print "Error: no such file exists"
@@ -268,15 +334,15 @@ if(__name__ == "__main__"):
     plain_txt = "plain_txt.txt"
     cipher_txt = "cipher_text.txt"
     print "-----------------------------------------------------------"
-    print "                  Welcome to Affine Cipher"
+    print "                       Affine Cipher"
     print "-----------------------------------------------------------"
     plain_txt = tokenize(raw_file, plain_txt)
-    key = key_gen_aff()
-    cipher_txt = enc_aff(key, plain_txt, cipher_txt)
-    plain_txt = dec_aff(key, cipher_txt, plain_txt)
+    aff_key = key_gen_aff()
+    cipher_txt = enc_aff(aff_key, plain_txt, cipher_txt)
+    plain_txt = dec_aff(aff_key, cipher_txt, plain_txt)
 
     print "-----------------------------------------------------------"
-    print "               Welcome to Vigenere Cipher"
+    print "                      Vigenere Cipher"
     print "-----------------------------------------------------------"
     plain_txt = tokenize(raw_file, plain_txt)
     key_length = 5
@@ -286,7 +352,7 @@ if(__name__ == "__main__"):
     plain_txt = dec_vig(vig_key, cipher_txt, plain_txt)
 
     print "-----------------------------------------------------------"
-    print "              Welcome to Transposition Cipher"
+    print "                    Transposition Cipher"
     print "-----------------------------------------------------------"
     plain_txt = tokenize(raw_file, plain_txt)
 
@@ -294,5 +360,5 @@ if(__name__ == "__main__"):
     shift_alphabet = shift_alpha(rand_alpha_num, trans_key)
 
     cipher_txt = enc_trans(rand_alpha_num, shift_alphabet, plain_txt, cipher_txt)
-    plain_txt = dec_trans(rand_alpha_num, shift_alphabet, cipher_txt)
+    plain_txt = dec_trans(rand_alpha_num, shift_alphabet, cipher_txt, plain_txt)
 """
