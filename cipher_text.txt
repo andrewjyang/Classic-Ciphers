@@ -1,2 +1,4 @@
+--- viginere cipher ---
+encrypted text: KRTNQFJWUASQUTQFNDJBZUAXF
 --- transposition cipher ---
-encrypted text: LGZNT1CLMNBIT17TTV55C1Y
+encrypted text: KRTNQFJWUASQUTQFNDJBZUAXF

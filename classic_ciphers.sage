@@ -17,12 +17,6 @@ import re as regex
 import random
 import math
 
-# alpha is ordered alphabet
-#num are the integers 0:25.
-#dict is a dictionary with letters as keys, and numbers as values.
-alpha = [chr(i) for i in range (ord('A'),ord('Z')+1)]
-num = [i for i in range(26)]
-dict = {k: v for k, v in zip(alpha, num)}
 
 def tokenize(raw_file, plain_txt):
     """
@@ -56,34 +50,58 @@ def tokenize(raw_file, plain_txt):
 """
 Vigenere Cipher
 """
+alpha_num = [chr(i) for i in range (ord('A'),ord('Z')+1)]
+num = [i for i in range(26)]
+dictionary = {k: v for k, v in zip(alpha_num, num)}
 #returns a randomly generated vigenere key of length, "key_length"
 def key_gen_vig(key_length):
     key = []
     for x in xrange(0, key_length):
-        key.append(Permutations(alpha).random_element()[0])
-    print "vigenere cipher key: " + str(key)
+        key.append(Permutations(alpha_num).random_element()[0])
+    key = ''.join(key)
+    print "vigenere cipher key: " + key
+
     return key
 # reads and encrypts plain_txt using the vigenere cipher and key.
 # writes the output to the file cipher_txt
 def enc_vig(key, plain_txt, cipher_txt):
-    key_l = list(key)
-    #use tokenise to get plain_txt, will finish when tokenise done, for now use string
-    p_txt_l = list(plain_txt)
-    c_txt_l = []
-    for i in xrange(0, len(p_txt_l)):
-            val = (dict[p_txt_l[i]]+dict[key_l[i%len(key_l)]])%26
-            c_txt_l.append(alpha[val])
-    print c_txt_l
+    key_list = list(key)
+    plain_txt_list = list(plain_txt)
+    cipher_txt_list = []
+    for i in xrange(0, len(plain_txt_list)):
+            val = (dictionary[plain_txt_list[i]] + dictionary[key_list[i % len(key_list)]]) % 26
+            cipher_txt_list.append(alpha_num[val])
+
+    cipher_txt = ''.join(cipher_txt_list)
+    print "encrypted text: " + cipher_txt
+
+    if not os.path.isfile("cipher_text.txt"):
+        print "Error: no such file exists"
+    else:
+        with open("cipher_text.txt", 'w') as cipher_text:
+            cipher_text.write("--- viginere cipher ---\nencrypted text: " + str(cipher_txt) + "\n")
+
+    return cipher_txt
+
 #reads and decrypts cipher_txt using the vigenere cipher and key.
 # writes the output to the file plain_txt
-def dec_vig(key, plain_txt, cipher_txt):
-    key_l = list(key)
-    p_txt_l = []
-    c_txt_l = list(cipher_txt)
-    for i in xrange(0, len(c_txt_l)):
-        val = (dict[c_txt_l[i]]-dict[key_l[i%len(key_l)]])%26
-        p_txt_l.append(alpha[val])
-    print p_txt_l
+def dec_vig(key, cipher_txt, plain_txt):
+    key_list = list(key)
+    plain_txt_list = []
+    cipher_txt_list = list(cipher_txt)
+    for i in xrange(0, len(cipher_txt_list)):
+        val = (dictionary[cipher_txt_list[i]] - dictionary[key_list[i % len(key_list)]]) % 26
+        plain_txt_list.append(alpha_num[val])
+    plain_txt = ''.join(plain_txt_list)
+    print "decrypted text: " + plain_txt
+
+    if not os.path.isfile("plain_txt.txt"):
+        print "Error: no such file exists"
+    else:
+        with open("plain_txt.txt", 'a') as cipher_text:
+            cipher_text.write("--- viginere cipher ---\ndecrypted text: " + str(plain_txt) + "\n")
+
+    return plain_txt
 
 """
 Alphabetic Transposition Cipher
@@ -151,7 +169,7 @@ def enc_trans(rand_alpha_num, shift_alphabet, plain_txt, cipher_txt):
     if not os.path.isfile("cipher_text.txt"):
         print "Error: no such file exists"
     else:
-        with open("cipher_text.txt", 'w') as cipher_text:
+        with open("cipher_text.txt", 'a') as cipher_text:
             cipher_text.write("--- transposition cipher ---\nencrypted text: " + str(cipher_txt) + "\n")
 
     return cipher_txt
@@ -179,7 +197,7 @@ def dec_trans(rand_alpha_num, shift_alphabet, cipher_txt):
     if not os.path.isfile("plain_txt.txt"):
         print "Error: no such file exists"
     else:
-        with open("plain_txt.txt", 'w') as cipher_text:
+        with open("plain_txt.txt", 'a') as cipher_text:
             cipher_text.write("--- transposition cipher ---\ndecrypted text: " + str(plain_txt) + "\n")
 
     return plain_txt
@@ -195,19 +213,34 @@ if(__name__ == "__main__"):
     plain_txt = "plain_txt.txt"
     cipher_txt = ""
     print "-----------------------------------------------------------"
+    print "                  Welcome to Affine Cipher"
+    print "-----------------------------------------------------------"
+    plain_txt = tokenize(raw_file, plain_txt)
+
+
+
+
+    print "-----------------------------------------------------------"
     print "               Welcome to Vigenere Cipher"
     print "-----------------------------------------------------------"
-    # key_length = 5
-    # vig_key = key_gen_vig(key_length)
-    # enc_vig(key)
+    plain_txt = ""
+    plain_txt = tokenize(raw_file, plain_txt)
+
+    key_length = 5
+    vig_key = key_gen_vig(key_length)
+
+    cipher_txt = enc_vig(vig_key, plain_txt, cipher_txt)
+    plain_txt = dec_vig(vig_key, cipher_txt, plain_txt)
 
 
     print "-----------------------------------------------------------"
     print "              Welcome to Transposition Cipher"
     print "-----------------------------------------------------------"
+    plain_txt = ""
+    plain_txt = tokenize(raw_file, plain_txt)
+
     rand_alpha_num, trans_key = key_gen_trans()
     shift_alphabet = shift_alpha(rand_alpha_num, trans_key)
 
-    plain_txt = tokenize(raw_file, plain_txt)
     cipher_txt = enc_trans(rand_alpha_num, shift_alphabet, plain_txt, cipher_txt)
     plain_txt = dec_trans(rand_alpha_num, shift_alphabet, cipher_txt)
