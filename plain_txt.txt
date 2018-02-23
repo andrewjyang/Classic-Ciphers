@@ -1,5 +1,3 @@
 tokenized plain text: WITHDRAWONEHUNDREDDOLLARS
---- viginere cipher ---
+--- affine cipher ---
 decrypted text: WITHDRAWONEHUNDREDDOLLARS
---- transposition cipher ---
-decrypted text: DLUHAERFCP7ACUAEH1RM0CPJE

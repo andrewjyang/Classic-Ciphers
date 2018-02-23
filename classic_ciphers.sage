@@ -17,6 +17,9 @@ import re as regex
 import random
 import math
 
+alphabet = [chr(i) for i in range (ord('A'),ord('Z')+1)]
+num = [i for i in range(26)]
+dictionary = {k: v for k, v in zip(alphabet, num)}
 
 def tokenize(raw_file, plain_txt):
     """
@@ -44,20 +47,72 @@ def tokenize(raw_file, plain_txt):
         with open(plain_txt, 'w') as plain_text:
             plain_text.write("tokenized plain text: " + clean_rt_string + "\n")
             plain_txt = clean_rt_string
-    print "plain text: " + plain_txt
+    print "plain text: "
     return plain_txt
 
+
+"""
+Affine Cipher
+"""
+#returns a two-tuple containing alpha and beta,
+#legal and randomly generated affine keys
+def key_gen_aff():
+    a_set = {x for x in xrange(2,26) if gcd(x,26) == 1}
+    b_set = {y for y in xrange(0,26)}
+    rand_tuple = (random.sample(a_set,1)[0],random.sample(b_set,1)[0])
+    print "affine cipher key: " + str(rand_tuple)
+
+    return rand_tuple
+
+#reads and encrypts plain_txt using the affine cipher and key.
+#writes the output to the file cipher_txt
+def enc_aff(key, plain_txt, cipher_txt):
+    alpha = key[0]
+    beta = key[1]
+    plain_txt_list = list(plain_txt)
+    cipher_txt_list = []
+    for i in xrange(0, len(plain_txt_list)):
+        val = (dictionary[plain_txt_list[i]] * alpha + beta) % 26
+        cipher_txt_list.append(alphabet[val])
+    cipher_txt = ''.join(cipher_txt_list)
+    print "encrypted text: "
+
+    if not os.path.isfile("cipher_text.txt"):
+        print "Error: no such file exists"
+    else:
+        with open("cipher_text.txt", 'w') as cipher_text:
+            cipher_text.write("--- affine cipher ---\nencrypted text: " + str(cipher_txt) + "\n")
+
+    return cipher_txt
+
+#reads and decrypts cipher_txt using the affine cipher and key. writes the output to the file plain_txt
+def dec_aff(key, cipher_txt, plain_txt):
+    alpha = key[0]
+    beta = key[1]
+    alpha_inverse = inverse_mod(alpha,26)
+    cipher_txt_list = list(cipher_txt)
+    plain_txt_list = []
+    for i in xrange(0,len(cipher_txt_list)):
+        val = ((dictionary[cipher_txt_list[i]] - beta) * alpha_inverse) % 26
+        plain_txt_list.append(alphabet[val])
+    plain_txt = ''.join(plain_txt_list)
+    print "decrypted text: " + plain_txt
+
+    if not os.path.isfile("plain_txt.txt"):
+        print "Error: no such file exists"
+    else:
+        with open("plain_txt.txt", 'a') as cipher_text:
+            cipher_text.write("--- affine cipher ---\ndecrypted text: " + str(plain_txt) + "\n")
+
+    return plain_txt
 """
 Vigenere Cipher
 """
-alpha_num = [chr(i) for i in range (ord('A'),ord('Z')+1)]
-num = [i for i in range(26)]
-dictionary = {k: v for k, v in zip(alpha_num, num)}
 #returns a randomly generated vigenere key of length, "key_length"
 def key_gen_vig(key_length):
     key = []
     for x in xrange(0, key_length):
-        key.append(Permutations(alpha_num).random_element()[0])
+        key.append(Permutations(alphabet).random_element()[0])
     key = ''.join(key)
     print "vigenere cipher key: " + key
 
@@ -70,10 +125,9 @@ def enc_vig(key, plain_txt, cipher_txt):
     cipher_txt_list = []
     for i in xrange(0, len(plain_txt_list)):
             val = (dictionary[plain_txt_list[i]] + dictionary[key_list[i % len(key_list)]]) % 26
-            cipher_txt_list.append(alpha_num[val])
+            cipher_txt_list.append(alphabet[val])
 
     cipher_txt = ''.join(cipher_txt_list)
-    print "encrypted text: " + cipher_txt
 
     if not os.path.isfile("cipher_text.txt"):
         print "Error: no such file exists"
@@ -91,7 +145,7 @@ def dec_vig(key, cipher_txt, plain_txt):
     cipher_txt_list = list(cipher_txt)
     for i in xrange(0, len(cipher_txt_list)):
         val = (dictionary[cipher_txt_list[i]] - dictionary[key_list[i % len(key_list)]]) % 26
-        plain_txt_list.append(alpha_num[val])
+        plain_txt_list.append(alphabet[val])
     plain_txt = ''.join(plain_txt_list)
     print "decrypted text: " + plain_txt
 
@@ -202,41 +256,38 @@ def dec_trans(rand_alpha_num, shift_alphabet, cipher_txt):
 
     return plain_txt
 
+"""
 if(__name__ == "__main__"):
-    """
+
     Description:
         main() drives the 3 classic ciphers: Affine, Vigenere, and Alphabetic
     Arguments: n/a
     Returns: n/a
-    """
+
     raw_file = "raw_file.txt"
     plain_txt = "plain_txt.txt"
-    cipher_txt = ""
+    cipher_txt = "cipher_text.txt"
     print "-----------------------------------------------------------"
     print "                  Welcome to Affine Cipher"
     print "-----------------------------------------------------------"
     plain_txt = tokenize(raw_file, plain_txt)
-
-
-
+    key = key_gen_aff()
+    cipher_txt = enc_aff(key, plain_txt, cipher_txt)
+    plain_txt = dec_aff(key, cipher_txt, plain_txt)
 
     print "-----------------------------------------------------------"
     print "               Welcome to Vigenere Cipher"
     print "-----------------------------------------------------------"
-    plain_txt = ""
     plain_txt = tokenize(raw_file, plain_txt)
-
     key_length = 5
     vig_key = key_gen_vig(key_length)
 
     cipher_txt = enc_vig(vig_key, plain_txt, cipher_txt)
     plain_txt = dec_vig(vig_key, cipher_txt, plain_txt)
 
-
     print "-----------------------------------------------------------"
     print "              Welcome to Transposition Cipher"
     print "-----------------------------------------------------------"
-    plain_txt = ""
     plain_txt = tokenize(raw_file, plain_txt)
 
     rand_alpha_num, trans_key = key_gen_trans()
@@ -244,3 +295,4 @@ if(__name__ == "__main__"):
 
     cipher_txt = enc_trans(rand_alpha_num, shift_alphabet, plain_txt, cipher_txt)
     plain_txt = dec_trans(rand_alpha_num, shift_alphabet, cipher_txt)
+"""
