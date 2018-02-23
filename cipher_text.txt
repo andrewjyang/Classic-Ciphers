@@ -1,0 +1,2 @@
+--- transposition cipher ---
+encrypted text: LGZNT1CLMNBIT17TTV55C1Y

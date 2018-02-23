@@ -1,0 +1,2 @@
+--- transposition cipher ---
+decrypted text: WITHDRAW1HUNDREDDOLLARS
