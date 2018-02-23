@@ -1,8 +1,6 @@
 --- affine cipher ---
-encrypted text: RZCUASLRDYFUHYASFAADOOLSX
+encrypted text: RXWQOITRNGVQDGOIVOONSSTIP
 --- viginere cipher ---
-encrypted text: ZHDPWUZGWGHGEVWUDNLHOKKZL
+encrypted text: FKTCMACWJWNJUIMAGDYXUNAMB
 --- transposition cipher ---
-encrypted text: BDVMYXGBFTHMSTYXHYYFNNGXL
---- transposition cipher ---
-encrypted text: 9VA61ML975J6Y51MJ117BBLMG
+encrypted text: 8XR63Q2840U6K03QU334BB2QI
