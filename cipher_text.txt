@@ -1,6 +1,0 @@
---- affine cipher ---
-encrypted text: RXWQOITRNGVQDGOIVOONSSTIP
---- viginere cipher ---
-encrypted text: FKTCMACWJWNJUIMAGDYXUNAMB
---- transposition cipher ---
-encrypted text: 8XR63Q2840U6K03QU334BB2QI
