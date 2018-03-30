@@ -6,10 +6,7 @@ Project: 4
 Sources: n/a
 @authors: Andrew Yang and Jeb Kilfoyle
 @version v1.0 February 23, 2018
-Instructions:
-    invoke `>>> cd Classic-Ciphers
-            >>> sage
-            >>> load("classic_ciphers.sage")            `
+            `
 """
 import os.path
 import re as regex
@@ -113,7 +110,7 @@ def dec_aff(key, cipher_txt, plain_txt):
     if not os.path.isfile(plain_txt):
         open(plain_txt, 'w+')
     with open(plain_txt, 'a') as cipher_text:
-        cipher_text.write(str(plain_txt) + "\n")
+        cipher_text.write(plain_text + "\n")
     return #plain_txt
 """
 Vigenere Cipher
@@ -253,36 +250,3 @@ def dec_trans( key, cipher_txt, plain_txt):
     with open(plain_txt, 'a') as plain_text_f:
             plain_text_f.write(plain_txt_str + "\n")
     return #plain_txt
-"""
-if(__name__ == "__main__"):
-    Description:
-        main() drives the 3 classic ciphers: Affine, Vigenere, and Alphabetic
-    Arguments: n/a
-    Returns: n/a
-    raw_file = "raw_file.txt"
-    plain_txt = "plain_txt.txt"
-    cipher_txt = "cipher_text.txt"
-    print "-----------------------------------------------------------"
-    print "                       Affine Cipher"
-    print "-----------------------------------------------------------"
-    plain_txt = tokenize(raw_file, plain_txt)
-    aff_key = key_gen_aff()
-    cipher_txt = enc_aff(aff_key, plain_txt, cipher_txt)
-    plain_txt = dec_aff(aff_key, cipher_txt, plain_txt)
-    print "-----------------------------------------------------------"
-    print "                      Vigenere Cipher"
-    print "-----------------------------------------------------------"
-    plain_txt = tokenize(raw_file, plain_txt)
-    key_length = 5
-    vig_key = key_gen_vig(key_length)
-    cipher_txt = enc_vig(vig_key, plain_txt, cipher_txt)
-    plain_txt = dec_vig(vig_key, cipher_txt, plain_txt)
-    print "-----------------------------------------------------------"
-    print "                    Transposition Cipher"
-    print "-----------------------------------------------------------"
-    plain_txt = tokenize(raw_file, plain_txt)
-    rand_alpha_num, trans_key = key_gen_trans()
-    shift_alphabet = shift_alpha(rand_alpha_num, trans_key)
-    cipher_txt = enc_trans(rand_alpha_num, shift_alphabet, plain_txt, cipher_txt)
-    plain_txt = dec_trans(rand_alpha_num, shift_alphabet, cipher_txt, plain_txt)
-"""
